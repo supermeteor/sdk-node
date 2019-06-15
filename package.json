@@ -1,0 +1,19 @@
+{
+  "name": "supermetor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/supermeteor/sdk-node.git"
+  },
+  "author": "Supermeteor",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/supermeteor/sdk-node/issues"
+  },
+  "homepage": "https://github.com/supermeteor/sdk-node#readme"
+}
