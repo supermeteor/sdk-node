@@ -22,7 +22,7 @@ Here is the sample function call for send sms.
 #### Type must be: sms or whatsapp
 
 ```javascript
-await supermeteor.sendMessage('type','phone','message');
+await supermeteor.sendMessage('sms|whatsapp','phone','message');
 ```
 ### 2. For sending email:
 
