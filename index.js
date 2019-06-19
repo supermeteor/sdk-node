@@ -1,3 +1,5 @@
+'use strict';
+
 const axios = require('axios');
 
 const host = 'https://email-uat.lncknight.com'
@@ -26,6 +28,8 @@ let main = secret => {
   }
 }
 
-module.exports = (secret) => {
+let supermeteor = (secret) => {
   return main(secret)
 }
+
+module.exports = supermeteor
