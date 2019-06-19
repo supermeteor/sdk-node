@@ -7,7 +7,7 @@ install using npm
 ```bash
 npm install supermeteor
 ```
-include supermeterv1 in your file
+include supermeter in your file
 
 ```javascript
 const supermeteor = require('supermeteor')('SECRET_KEY');
