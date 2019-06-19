@@ -1,6 +1,6 @@
 let secret = 'PLACE_SECRET'
 
-let supermeteor = require('../src/index')(secret)
+let supermeteor = require('./index')(secret)
 
 supermeteor.sendMessage('sms', '+85264869999', 'hello world!')
 .then(rs => {
