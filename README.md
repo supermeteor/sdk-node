@@ -10,7 +10,7 @@ npm install supermeteor
 include supermeterv1 in your file
 
 ```javascript
-const supermeteor = require('supermeteor');
+const supermeteor = require('supermeteor')('SECRET_KEY');
 ```
 Package uses axios for HTTP request, so for function use "async" prefix and for mathod use "await" prefix.
 
@@ -22,12 +22,12 @@ Here is the sample function call for send sms.
 #### Type must be: sms or whatsapp
 
 ```javascript
-await supermeteor.sendMessage('secret key','type','phone','message');
+await supermeteor.sendMessage('type','phone','message');
 ```
 ### 2. For sending email:
 
 pass secret key, email, subject, message as function parameter,
 Here is the sample function call for send email.
 ```javascript
-await supermeteor.sendEmail('secret key','email','subject','message');
+await supermeteor.sendEmail('email','subject','message');
 ```
