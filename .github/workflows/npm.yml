@@ -1,47 +1,25 @@
-name: NPM publish CD workflow
-
+name: npm-publish
 on:
-  release:
-    # This specifies that the build will be triggered when we publish a release
-    types: [published]
-
+  push:
+    tags:
+      - "*"
 jobs:
-  build:
-
-    # Run on latest version of ubuntu
+  npm-publish:
+    name: npm-publish
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-      with:
-        # "ref" specifies the branch to check out.
-        # "github.event.release.target_commitish" is a global variable and specifies the branch the release targeted
-        ref: ${{ github.event.release.target_commitish }}
-    # install Node.js
-    - name: Use Node.js 12
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12
-        # Specifies the registry, this field is required!
-        registry-url: https://registry.npmjs.org/
-    # clean install of your projects' deps. We use "npm ci" to avoid package lock changes
-    - run: npm ci
-    # set up git since we will later push to the repo
-    - run: git config --global user.name "supermeteor"
-    - run: git config --global user.email "lncknight@gmail.com"
-    # upgrade npm version in package.json to the tag used in the release.
-    - run: npm version ${{ github.event.release.tag_name }}
-    # build the project
-    - run: npm run build
-    # run tests just in case
-    - run: npm test
-    # publish to NPM -> there is one caveat, continue reading for the fix
-    - run: npm publish
-      env:
-        # Use a token to publish to NPM. See below for how to set it up
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-    # push the version changes to GitHub
-    - run: git push
-      env:
-        # The secret is passed automatically. Nothing to configure.
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Publish if version has been updated
+      uses: pascalgn/npm-publish-action@1.3.9
+      with: # All of theses inputs are optional
+        tag_name: "v%s"
+        tag_message: "v%s"
+        create_tag: "true"
+        commit_pattern: "^Release (\\S+)"
+        workspace: "."
+        publish_command: "yarn"
+        publish_args: "--non-interactive"
+      env: # More info about the environment variables in the README
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Leave this as is, it's automatically generated
+        NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
