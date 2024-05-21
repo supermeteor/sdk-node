@@ -37,6 +37,30 @@ let main = (secret, opts = {}) => {
         subject,
         message,
       })
+    },
+    searchMessages: (accountId, {
+      limit = 10,
+      skip = 0,
+      dateTo,
+      dateFrom,
+      phoneNumber,
+      countryCode,
+      status,
+    }) => {
+      return client.get(`/account/${accountId}/messages`, {
+        headers: {
+          authorization: `${secret}`
+        },
+        params: {
+          limit,
+          skip,
+          dateTo,
+          dateFrom,
+          phoneNumber,
+          countryCode,
+          status,
+        }
+      })
     }
   }
 }
