@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/supermeteor/sdk-node#readme",
   "dependencies": {
-    "axios": "~0.28",
+    "axios": "~0.30",
     "lodash": "^4.17.21"
   }
 }
