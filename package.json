@@ -1,6 +1,6 @@
 {
-  "name": "@supermeteor/access",
-  "version": "1.1.4",
+  "name": "supermeteor",
+  "version": "1.1.5",
   "description": "",
   "main": "index.js",
   "scripts": {
