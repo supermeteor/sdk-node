@@ -1,6 +1,6 @@
 {
-  "name": "@supermeteor2/supermeteor",
-  "version": "1.2.0",
+  "name": "supermeteor",
+  "version": "1.2.1",
   "description": "",
   "main": "index.js",
   "scripts": {
