@@ -1,20 +1,73 @@
-name: Publish to npm
+name: Verify Node and publish npm
+
 on:
+  pull_request:
+  workflow_dispatch:
   push:
-    tags:
-      - 'v*'
+    branches: [master]
+    tags: ['v[0-9]*.[0-9]*.[0-9]*']
+
+permissions:
+  contents: read
 
 jobs:
-  publish:
+  verify:
+    name: Verify Node ${{ matrix.node }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['18', '19', '20', '21', '22', '23', '24', '25', '26']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install locked dependencies with engine checks
+        run: npm ci --engine-strict --ignore-scripts
+      - run: npm run lint
+      - run: npm test
+      - name: Resolve current allowed dependencies and retest
+        run: |
+          npm update --engine-strict --ignore-scripts
+          npm test
+      - name: Check package contents
+        run: npm pack --dry-run --ignore-scripts
+      - name: Write compatibility report
+        if: always()
+        env:
+          RESULT: ${{ job.status }}
+        run: |
+          {
+            echo "### Node $(node --version): $RESULT"
+            echo "npm $(npm --version); strict engine checks, locked/current dependency installs, syntax, offline API tests and package checks."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
       id-token: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
-      - run: npm ci
+      - name: Check tag matches package version
+        run: node -e 'if (process.env.GITHUB_REF_NAME !== "v" + require("./package.json").version) throw new Error("Tag must match package.json version")'
+      - name: Install npm with trusted publishing support
+        run: npm install --global npm@11
+      - run: npm ci --engine-strict --ignore-scripts
+      - run: npm test
       - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

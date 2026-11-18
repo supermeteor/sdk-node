@@ -34,8 +34,48 @@ await supermeteor.sendMessage('sms|whatsapp','phone','message');
 pass secret key, email, subject, message as function parameter,
 Here is the sample function call for send email.
 ```javascript
-await supermeteor.sendEmail('email','subject','message');
+const response = await supermeteor.sendEmail('user@example.com', 'Subject', 'Body');
+console.log(response.data); // {msg: 'OK'}
+
+// Plain text (HTML remains the API default).
+await supermeteor.sendEmail('user@example.com', 'Subject', 'Body', {html: false});
 ```
+
+
+The API selects the sender from the account email configuration. Email requests wait up to 10 seconds for provider acceptance; acceptance does not guarantee inbox delivery.
+
+### 3. SMS verification
+
+```javascript
+const start = await supermeteor.verifyStart('+6591234567');
+const result = await supermeteor.verifyCheck(start.data.session_id, '001234');
+console.log(result.data); // {status: 'verified'} or {status: 'failed', reason: 'incorrect_code'}
+```
+
+Use an E.164 phone number and a six-digit **string** to preserve leading zeroes. Requires SMS Verify enabled on your account and an API deployment exposing `/sms/verifyStart` and `/sms/verifyCheck`. SDK support does not enable the server feature. A pending start means acceptance, not delivery. Verify requests use a 20-second timeout. Axios errors retain HTTP status and response data; requests do not automatically retry, since a timed-out start may already have sent an SMS.
+
+All methods return Axios responses; access the API result through `response.data`. Existing SMS/WhatsApp and message-search calls retain their behavior.
+
+## Node compatibility and checks
+
+Requires Node >=18. GitHub Actions checks the latest patch of each stable major from 18 through 26 using strict dependency engine validation, locked and freshly resolved dependencies, syntax checks, offline API tests and package inspection. Each matrix job writes a report to the workflow Summary. Historical Node releases are included for compatibility; use a maintained Node release for production. Future majors require verification when released.
+
+```bash
+npm ci --engine-strict --ignore-scripts
+npm run lint
+npm test
+npm pack --dry-run --ignore-scripts
+```
+
+Tests intercept Axios before network I/O and send no messages.
+
+## Publishing to npm
+
+The `.github/workflows/npm.yml` workflow runs verification on pull requests, pushes to `master`, version tags and manual runs. Publishing runs only for version tags, after every Node job passes, and requires the tag to match `package.json`.
+
+Add a repository Actions secret named `NPM_TOKEN` containing an npm granular access token with write permission for **supermeteor** and permission to bypass 2FA for automated publishing. The publishing step passes it to npm as `NODE_AUTH_TOKEN`; the job uses npm 11 and publishes provenance through GitHub OIDC.
+
+For a release, commit the SDK changes, bump the version (for example `npm version minor` for these new methods), then push the commit and generated version tag. npm versions are immutable; use a new version for each release.
 
 # Incoming webhook
 Inbound message hook is available in real-time, and setting is in the Setting Page.
